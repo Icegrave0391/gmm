@@ -13,3 +13,5 @@
 >  回顾一下比特数的提取过程：将一帧分为4x5的20个块，分别对每一块提取。同时将帧分为**奇数帧**、**被2整除的偶数帧**、**被4整除的偶数帧**。
 >
 > 由此得到data1.txt, data2.txt, data3.txt
+
+<img src="/Users/chuqiz/Library/Application Support/typora-user-images/image-20200113123531071.png" alt="image-20200113123531071" style="zoom:50%;" />
