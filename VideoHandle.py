@@ -2,6 +2,8 @@ from sklearn.mixture import GaussianMixture
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
+import getThreshold
+import PickForeground as imghandler
 CTU_NUMS = 20
 FRAME_NUMS = 690
 ####################PARAMS################################
@@ -118,7 +120,11 @@ for i in range(3):
             for n in range(n_comp):
                 background[i][j][k].append((gmm.weights_[n], float(gmm.means_[n]),float(gmm.covariances_[n])))
 print(background)
-#params
+
+#get threshold
+k_step = 0.1
+k_lembda = 0.6
+threshold = getThreshold.getThreshold(backgroundNum, backgroundNum, fg_table, k_lembda, k_step)
 
 #plot test
 
