@@ -6,9 +6,12 @@ import getThreshold
 import PickForeground as imghandler
 CTU_NUMS = 20
 FRAME_NUMS = 690
+d0 = 3
+d1 = 4
+d2 = 5
 ####################PARAMS################################
 background = []
-backgroundNum = np.zeros(shape=(3, 4, 5))
+backgroundNum = np.zeros(shape=(d0, d1, d2))
 foreground = []
 img_data = []
 ##########################################################
@@ -69,8 +72,8 @@ fg_table = []
 #bg_table[i][j][k] => 每一个对应20个blocks的矩阵
 #fg_table 同理
 ###############################################
-matrix(bg_table, 3, 4, 5)
-matrix(fg_table, 3, 4, 5)
+matrix(bg_table, d0, d1, d2)
+matrix(fg_table, d0, d1, d2)
 #ground_truth
 gt = []
 a = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]
@@ -81,38 +84,38 @@ for i in range(2, 691):
     gt.append(I)
 #筛前景 & 整合数据
 matrix(img_data, FRAME_NUMS, 0, 0)
-for i_idx in range(3):
+for i_idx in range(d0):
     data = index[i_idx]
     lens = len(data) #分别处理data1 data2 data3
     for i in range(lens):
         img_data[data[i]] = f_CTU_data[i_idx][i]
-        for j in range(4):
-            for k in range(5):
+        for j in range(d1):
+            for k in range(d2):
                 frame = data[i]
                 temp_jk = gt[frame][j][k]   #对应块的groundtruth
                 if temp_jk == 0:            #bg
                     backgroundNum[i_idx][j][k] += 1
-                    temp_jkidx = i * 20 + j * 5 + k
+                    temp_jkidx = i * CTU_NUMS + j * d2 + k
                     bg_table[i_idx][j][k].append(f_data[i_idx][temp_jkidx])
                 else:
-                    temp_jkidx = i * 20 + j * 5 + k
+                    temp_jkidx = i * CTU_NUMS + j * d2 + k
                     fg_table[i_idx][j][k].append(f_data[i_idx][temp_jkidx])
 
 #Gau data
-bg_tableFit = np.array(bg_table).reshape(3,4,5)
-foreground = np.array(fg_table).reshape(3,4,5)
+bg_tableFit = np.array(bg_table).reshape(d0,d1,d2)
+foreground = np.array(fg_table).reshape(d0,d1,d2)
 #print(foreground)
 
 ###################################################
 #3-D mat （shape = (3,4,5)）元素是list(w, means, sds)
 ###################################################
-matrix(background, 3, 4, 5)
+matrix(background, d0, d1, d2)
 #Gaus
 n_comp = 5
 gmm = GaussianMixture(n_components=n_comp, covariance_type='diag', random_state=0)
-for i in range(3):
-    for j in range(4):
-        for k in range(5):
+for i in range(d0):
+    for j in range(d1):
+        for k in range(d2):
             gmm.fit(np.array(bg_tableFit[i][j][k]).reshape(-1, 1))
             # means_table[i][j][k] = gmm.means_
             # sds_table[i][j][k] = gmm.covariances_
