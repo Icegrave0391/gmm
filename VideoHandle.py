@@ -2,6 +2,24 @@ from sklearn.mixture import GaussianMixture
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
+CTU_NUMS = 20
+FRAME_NUMS = 690
+####################PARAMS################################
+background = []
+backgroundNum = np.zeros(shape=(3, 4, 5))
+foreground = []
+img_data = []
+##########################################################
+def list_of_groups(init_list, childern_list_len):
+    #init_list为初始化的列表，childern_list_len初始化列表中的几个数据组成一个小列表
+    #:param init_list:
+    #:param childern_list_len:
+    #:return:
+    list_of_group = zip(*(iter(init_list),) *childern_list_len)
+    end_list = [list(i) for i in list_of_group]
+    count = len(init_list) % childern_list_len
+    end_list.append(init_list[-count:]) if count !=0 else end_list
+    return end_list
 
 def normfun(x, mu, sigma):
     p = np.exp(-((x - mu) ** 2)) / (2*sigma ** 2) / (sigma * np.sqrt((2 * np.pi)))
@@ -16,16 +34,19 @@ with open('./datalist/data1.txt', 'r') as f1:
     f_read1 = f1.read()
     f_data1 = f_read1.replace("\n", "").split()
     f_data1 = list(map(int, f_data1))
+    f_temp1 = list_of_groups(f_data1, CTU_NUMS)
 with open('./datalist/data2.txt', 'r') as f2:
     f_read2 = f2.read()
     f_data2 = f_read2.replace("\n", "").split()
     f_data2 = list(map(int, f_data2))
+    f_temp2 = list_of_groups(f_data2, CTU_NUMS)
 with open('./datalist/data3.txt', 'r') as f3:
     f_read3 = f3.read()
     f_data3 = f_read3.replace("\n", "").split()
     f_data3 = list(map(int, f_data3))
+    f_temp3 = list_of_groups(f_data3, CTU_NUMS)
 f_data = [f_data1, f_data2, f_data3]
-
+f_CTU_data = [f_temp1, f_temp2, f_temp3]
 #idx （奇数、模2、模4）
 index = [[],[],[]]
 for i in range(690):
@@ -39,12 +60,15 @@ for i in range(690):
 #print(index)
 #bg
 bg_table = []
-#############
+fg_table = []
+###############################################
 #bg_table : shape(3,4,5)
 #bg_table[0,1,2]: 分别是data1 data2 data3的bg
 #bg_table[i][j][k] => 每一个对应20个blocks的矩阵
-#############
-matrix(bg_table,3, 4, 5)
+#fg_table 同理
+###############################################
+matrix(bg_table, 3, 4, 5)
+matrix(fg_table, 3, 4, 5)
 #ground_truth
 gt = []
 a = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]
@@ -53,34 +77,33 @@ for i in range(2, 691):
     fpath = './groundtruth'+'/gt00'+str(1103+i)+'.png'
     I = mpimg.imread(fpath)
     gt.append(I)
-#print(gt[index[0][1]])
-#筛前景
+#筛前景 & 整合数据
+matrix(img_data, FRAME_NUMS, 0, 0)
 for i_idx in range(3):
     data = index[i_idx]
-    #print(data)
     lens = len(data) #分别处理data1 data2 data3
-    #print("len: %d" % lens)
     for i in range(lens):
+        img_data[data[i]] = f_CTU_data[i_idx][i]
         for j in range(4):
             for k in range(5):
                 frame = data[i]
                 temp_jk = gt[frame][j][k]   #对应块的groundtruth
-                if temp_jk == 0:
+                if temp_jk == 0:            #bg
+                    backgroundNum[i_idx][j][k] += 1
                     temp_jkidx = i * 20 + j * 5 + k
                     bg_table[i_idx][j][k].append(f_data[i_idx][temp_jkidx])
+                else:
+                    temp_jkidx = i * 20 + j * 5 + k
+                    fg_table[i_idx][j][k].append(f_data[i_idx][temp_jkidx])
+
 #Gau data
 bg_tableFit = np.array(bg_table).reshape(3,4,5)
-# means_table = []
-# sds_table = []
-# weights_table = []
+foreground = np.array(fg_table).reshape(3,4,5)
+#print(foreground)
 
-background = []
-############
-#means sds均为3-D mat （shape = (3,4,5)）元素是list, 对应data1/2/3中每个20blocks的参数
-############
-# matrix(means_table, 3, 4, 5)
-# matrix(sds_table, 3, 4, 5)
-# matrix(weights_table, 3, 4, 5)
+###################################################
+#3-D mat （shape = (3,4,5)）元素是list(w, means, sds)
+###################################################
 matrix(background, 3, 4, 5)
 #Gaus
 n_comp = 5
@@ -93,17 +116,10 @@ for i in range(3):
             # sds_table[i][j][k] = gmm.covariances_
             # weights_table[i][j][k] = gmm.weights_
             for n in range(n_comp):
-                background[i][j][k].append((gmm.weights_[n], (gmm.means_[n]), gmm.covariances_[n]))
-print(background[0][0][0])
-# t_table = [[[] for i in range(5)] for j in range(4)]
-# means_table = [[[] for i in range(5)] for j in range(4)]
-# sds_table = [[[] for i in range(5)] for j in range(4)]
-# for j in range(4):
-#     for k in range(5):
-#         t_table[j][k] = gmm.fit(bg_tableFit[j][k])
-#         means_table[j][k] = gmm.means_[:,1]
-#         sds_table[j][k] = gmm.covariances_[:,1]
-#         print(sds_table[j][k])
+                background[i][j][k].append((gmm.weights_[n], float(gmm.means_[n]),float(gmm.covariances_[n])))
+print(background)
+#params
+
 #plot test
 
 # means = means_table[1][3]
