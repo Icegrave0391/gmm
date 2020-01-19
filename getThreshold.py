@@ -17,20 +17,32 @@ def getThreshold(background, backgroundNum, foreground, lambda1, step):
     fore = []
     for i in background:
         if i[1]+3*i[2] > bMax:
-            bMax = i[1] + i[1]+3*i[2]
+            bMax = i[1]+3*i[2]
     for i in foreground:
         if i < fMin:
             fMin = i
     ratio = backgroundNum/(backgroundNum + len(foreground))
-    fAverage = np.mean(foreground)
-    if bMax > fAverage:
-        thresholdIter = fAverage + step
-        end = bMax
+    if foreground:
+        fMedium = np.median(foreground)
+        fMax = np.max(foreground)
+        fAverage = np.average(foreground)
     else:
-        thresholdIter = bMax + step
-        end = fAverage
+        fMedium = 100
+        fMax = 100
+        fAverage = 100
+    weightMax = -1
+    weightMaxIndex = 0
+    for i in range(len(background)):
+        if background[i][0] > weightMax:
+            weightMaxIndex = i
+            weightMax = background[i][0]
+    thresholdIter = background[weightMaxIndex][1]
+    threshold = background[weightMaxIndex][1] + 3*background[weightMaxIndex][2]
+    end = fMax
 
     while thresholdIter < end:
+        back = []
+        fore = []
         for i in background:
             if i[1] + 3 * i[2] > thresholdIter:
                 back.append(i)
@@ -53,6 +65,7 @@ def loss(threshold, back, fore, backMax, foreMin, ratio, lambda1):
         lossValue = lossValue + lambda1 * ratio * i[0] * ((threshold - (i[1] + 3 * i[2])) ** 2)
     for i in fore:
         lossValue = lossValue + (1-lambda1) * (1-ratio) * (1/len(fore)) * (threshold - i)**2
+    #if backMax < foreMin:
     lossValue = lossValue + (threshold-backMax)**2 + (threshold - foreMin)**2
     return lossValue
 
