@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import getThreshold
 import PickForeground as imghandler
+import plot as imgplot
 CTU_NUMS = 20
 FRAME_NUMS = 690
 d0 = 3
@@ -172,8 +173,10 @@ for i in range(d0):
         for k in range(d2):
             print("training %d %d %d" % (i, j, k))
             threshold[i][j][k] = getThreshold.getThreshold(background[i][j][k], backgroundNum[i][j][k], fg_table[i][j][k], k_lembda, k_step)
-
+#plot test
+imgplot.show_CTU_fr(2, 2, bg_table, fg_table, threshold)
 #judge bg or fg
 print("==============Start Img Process================")
-tags = imghandler.judgeBackOrFore(d1, d2, FRAME_NUMS, img_data, threshold, index[0], index[1], index[2])
+dataAfterFilter = imghandler.GaussianfilterByTime(img_data, FRAME_NUMS, 3, 1)
+tags = imghandler.judgeBackOrFore(d1, d2, FRAME_NUMS, dataAfterFilter, threshold, index[0], index[1], index[2])
 imghandler.showPictures(d1, d2, FRAME_NUMS, tags)
