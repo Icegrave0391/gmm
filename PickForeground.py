@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy as np
 import cv2
+import math
 import matplotlib.pyplot as plt
 
 
@@ -21,6 +22,19 @@ def judgeBackOrFore(H, W, frNum, data, thresholds, index1 ,index2, index3):
                         tag[frIndex][i][j] = 99
 
     return tag
+
+def GaussianfilterByTime(data, frNum, miu, sds):
+    GaussTemp = []
+    dataAfterFilter = data
+    dataChanged = 0
+    for i in range(1, miu * 2):
+        GaussTemp.append(math.exp(-((i - miu) ** 2) / (2 * (sds ** 2))) / (sds * math.sqrt(2 * math.pi)))
+    for k in range(20):
+        for i in range(2, frNum-2):
+            for j in range(-2, 3):
+                dataChanged = data[i+j][k]*GaussTemp[j+2]
+            dataAfterFilter[i][k] = dataChanged
+    return dataAfterFilter
 
 
 def showPictures(H, W, frNum, tag):
