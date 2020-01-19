@@ -50,6 +50,7 @@ with open('./datalist/data3.txt', 'r') as f3:
     f_data3 = f_read3.replace("\n", "").split()
     f_data3 = list(map(int, f_data3))
     f_temp3 = list_of_groups(f_data3, CTU_NUMS)
+
 f_data = [f_data1, f_data2, f_data3]
 f_CTU_data = [f_temp1, f_temp2, f_temp3]
 #idx （奇数、模2、模4）
@@ -104,10 +105,15 @@ for i_idx in range(d0):
 #Gau data
 bg_tableFit = np.array(bg_table).reshape(d0,d1,d2)
 foreground = np.array(fg_table).reshape(d0,d1,d2)
+print(foreground)
 #print(foreground)
 
 ###################################################
 #3-D mat （shape = (3,4,5)）元素是list(w, means, sds)
+means_t = []
+sds_t = []
+matrix(means_t, 3,4,5)
+matrix(sds_t, 3,4,5)
 ###################################################
 matrix(background, d0, d1, d2)
 #Gaus
@@ -117,50 +123,57 @@ for i in range(d0):
     for j in range(d1):
         for k in range(d2):
             gmm.fit(np.array(bg_tableFit[i][j][k]).reshape(-1, 1))
-            # means_table[i][j][k] = gmm.means_
-            # sds_table[i][j][k] = gmm.covariances_
-            # weights_table[i][j][k] = gmm.weights_
+            means_t[i][j][k] = gmm.means_
+            sds_t[i][j][k] = gmm.covariances_
             for n in range(n_comp):
                 background[i][j][k].append((gmm.weights_[n], float(gmm.means_[n]),float(gmm.covariances_[n])))
-print(background)
+
+means = means_t[0][0][0]
+sds = sds_t[0][0][0]
+x = np.arange(0, 250, 0.1)
+y = np.arange(0, 3, 0.1)
+y0 = []
+y1 = []
+y2 = []
+y3 = []
+y4 = []
+k = []
+thre = 0
+for i in x:
+    y0.append(normfun(i, means[0], sds[0]))
+for i in x:
+    y1.append(normfun(i, means[1], sds[1]))
+for i in x:
+    y2.append(normfun(i, means[2], sds[2]))
+for i in x:
+    y3.append(normfun(i, means[3], sds[3]))
+for i in x:
+    y4.append(normfun(i, means[4], sds[4]))
+for i in range(5):
+    thre = thre + means[i] + 3 * sds[i]
+for i in range(len(y)):
+    k.append(thre)
+
+plt.plot(x, y0, c='b')
+plt.plot(x, y1, c='r')
+plt.plot(x, y2, c='g')
+plt.plot(x, y3, c='m')
+plt.plot(x, y4, c='y')
+plt.plot(k, y, c='c')
+plt.show()
 
 #get threshold
-k_step = 0.1
+k_step = 10
 k_lembda = 0.6
-threshold = getThreshold.getThreshold(backgroundNum, backgroundNum, fg_table, k_lembda, k_step)
+print("++++++++++++++Start Training+++++++++++++++")
+threshold = np.zeros(shape=(d0, d1, d2))
+for i in range(d0):
+    for j in range(d1):
+        for k in range(d2):
+            print("training %d %d %d" % (i, j, k))
+            threshold[i][j][k] = getThreshold.getThreshold(background[i][j][k], backgroundNum[i][j][k], fg_table[i][j][k], k_lembda, k_step)
 
-#plot test
-
-# means = means_table[1][3]
-# sds = sds_table[1][3]
-# y0 = []
-# y1 = []
-# y2 = []
-# y3 = []
-# y4 = []
-# k = []
-# x = np.arange(0, 250, 0.1)
-# y = np.arange(0, 3, 0.1)
-# thre = 0
-# for i in x:
-#     y0.append(normfun(i, means[0], sds[0]))
-# for i in x:
-#     y1.append(normfun(i, means[1], sds[1]))
-# for i in x:
-#     y2.append(normfun(i, means[2], sds[2]))
-# for i in x:
-#     y3.append(normfun(i, means[3], sds[3]))
-# for i in x:
-#     y4.append(normfun(i, means[4], sds[4]))
-# for i in range(5):
-#     thre = thre + means[i] + 3 * sds[i]
-# for i in range(len(y)):
-#     k.append(thre)
-#
-# plt.plot(x, y0, c='b')
-# plt.plot(x, y1, c='r')
-# plt.plot(x, y2, c='g')
-# plt.plot(x, y3, c='m')
-# plt.plot(x, y4, c='y')
-# plt.plot(k, y, c='c')
-# plt.show()
+#judge bg or fg
+print("==============Start Img Process================")
+tags = imghandler.judgeBackOrFore(d1, d2, FRAME_NUMS, img_data, threshold, index[0], index[1], index[2])
+imghandler.showPictures(d1, d2, FRAME_NUMS, tags)
