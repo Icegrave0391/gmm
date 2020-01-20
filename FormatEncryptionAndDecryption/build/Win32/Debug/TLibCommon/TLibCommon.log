@@ -1,0 +1,31 @@
+﻿cl : Command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  TComYuv.cpp
+  TComWeightPrediction.cpp
+  TComTrQuant.cpp
+  TComSlice.cpp
+  TComSampleAdaptiveOffset.cpp
+  TComRom.cpp
+  TComRdCostWeightPrediction.cpp
+  TComRdCost.cpp
+  TComPrediction.cpp
+  TComPicYuvMD5.cpp
+  TComPicYuv.cpp
+  TComPicSym.cpp
+  TComPic.cpp
+  TComPattern.cpp
+  TComMotionInfo.cpp
+  TComLoopFilter.cpp
+  TComInterpolationFilter.cpp
+  TComDataCU.cpp
+  TComCABACTables.cpp
+  TComBitStream.cpp
+  Generating Code...
+  Compiling...
+  SEI.cpp
+  ContextModel3DBuffer.cpp
+  ContextModel.cpp
+  aeskey.cpp
+  Generating Code...
+cl : Command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  libmd5.c
+  TLibCommon.vcxproj -> E:\Working\Coding\EncryptionAndProcessing\FormatEncryptionAndDecryption\build\Win32\Debug\TLibCommon\TLibCommon.lib

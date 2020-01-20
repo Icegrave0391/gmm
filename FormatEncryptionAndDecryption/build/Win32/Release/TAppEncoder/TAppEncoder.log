@@ -1,0 +1,7 @@
+﻿  encmain.cpp
+  TAppEncCfg.cpp
+  TAppEncTop.cpp
+  Generating code
+  All 4555 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  TAppEncoder.vcxproj -> E:\Working\Coding\EncryptionAndProcessing\FormatEncryptionAndDecryption\build\..\bin\Win32\Release\TAppEncryptionEncoder.exe
