@@ -129,8 +129,8 @@ for i in range(d0):
             for n in range(n_comp):
                 background[i][j][k].append((gmm.weights_[n], float(gmm.means_[n]),float(gmm.covariances_[n])))
 
-means = means_t[0][0][0]
-sds = sds_t[0][0][0]
+means = means_t[0][3][1]
+sds = sds_t[0][3][1]
 x = np.arange(0, 250, 0.1)
 y = np.arange(0, 3, 0.1)
 y0 = []

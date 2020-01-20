@@ -1,6 +1,6 @@
 ## GMM
 
-### 数据信息
+### 一. 数据信息
 
 * **基本数据格式**
 
@@ -32,7 +32,7 @@
 
   `./media/img/test_images`文件夹下对应每一个frame的图片(.jpg)
 
-### 数据处理
+### 二. 数据处理
 
 数据处理模块：依照文件夹中的数据信息提取有效数据并建立相应数据结构存储。
 
@@ -155,3 +155,115 @@ for i in range(d0):
                 background[i][j][k].append((gmm.weights_[n], float(gmm.means_[n]),float(gmm.covariances_[n])))
 ```
 
+
+
+### 三. 训练threshold
+
+根据数据处理过程中提取到的每一个背景ctu在不同帧上的混合高斯模型，训练threshold。
+
+* *loss function*：
+
+$$
+f(thres) = \sum_iw_i*(thres-(\mu_i +3\sigma_i))^2 + (thres-\mu_{F_{min}})^2+(thres-\mu_{B_{max}})^2\\
+s.t. thres \in [\sum_iw_i(\mu_i+3\sigma_i),\  \overline{\mu_F}]
+$$
+
+> $\mu_i$：背景部分高斯分布的几个均值
+>
+> $w_i$：背景部分高斯分布的几个权值
+>
+> $\mu_{F_{min}}$：前景的最小值
+>
+> $\mu_{B_{max}}$：背景的最大值
+
+让thres取值在约束区间内变动，找到损失函数最小值即可得出最优threshold。
+
+```python
+def stepByStep(background, foreground, thresholdIter, end, bMax, fMin, ratio, All, lambda1, step):
+    threshold = 0
+    lossValue = 99999999
+    while thresholdIter < end:
+        back = []
+        fore = []
+        for i in background:
+            if i[1] + 3 * i[2] > thresholdIter:
+                back.append(i)
+        for i in foreground:
+            if i < thresholdIter:
+                fore.append(i)
+        lossValueNew = loss(thresholdIter, back, fore, bMax, fMin, ratio, All, lambda1)
+        if lossValueNew < lossValue:
+            lossValue = lossValueNew
+            threshold = thresholdIter
+            thresholdIter = thresholdIter + step
+        else:
+            thresholdIter = thresholdIter + step
+    return threshold
+
+
+def loss(threshold, back, fore, backMax, foreMin, ratio, All, lambda1):
+    lossValue = 0
+    for i in back:
+        lossValue = lossValue + lambda1 * ratio * i[0] * ((threshold - (i[1] + 3 * i[2])) ** 2)
+    for i in fore:
+        lossValue = lossValue + (1-lambda1) * (1-ratio) * (1/len(fore)) * (threshold - i)**2
+    lossValue = lossValue + 1/All*((threshold-backMax)**2 + (threshold - foreMin)**2)
+```
+
+
+
+### 四. 当前效果
+
+以ctu(3,3)为例，即第三行第三列的ctu。
+
+* ctu(3,3)在data1、data2、data3下的三个混合高斯模型：
+
+<img src="http://q4alsq26d.bkt.clouddn.com/Figure_1.png" style="zoom:33%;" />
+
+<img src="http://q4alsq26d.bkt.clouddn.com/Figure_2.png" style="zoom:33%;" />
+
+<img src="http://q4alsq26d.bkt.clouddn.com/Figure_3.png" style="zoom:33%;" />
+
+* ctu(3,3)的前背景在data1-3下的比特数频率分布直方图（红色竖线为计算得到的threshold）
+
+<img src="http://q4alsq26d.bkt.clouddn.com/Figure_.png" style="zoom:33%;" />
+
+* 结果的一些分析：
+
+1. gmm的参数
+
+我们观察到：在data1 data2中的高斯混合模型中，很多个高斯分布曲线的高度相同。进一步观察高斯混合模型中的参数如下（分别为ctu(3,3) ctu(4,2)）:
+
+<img src="http://q4alsq26d.bkt.clouddn.com/pa1.jpg" style="zoom:50%;" />
+
+<img src="http://q4alsq26d.bkt.clouddn.com/pa2.jpg" style="zoom:50%;" />
+
+可以看出权重最大的几个高斯分布标准差都为最小标准差$10^{-6}$。即数据分类基本都在几个特定bits的点。
+
+而data3中的bits分布如下(ctu(3,3))：
+
+<img src="http://q4alsq26d.bkt.clouddn.com/pa3.png" style="zoom:50%;" />
+
+可以看出data3的bits过于离散，因此我们需要在数据处理时着重处理。
+
+2. thres的计算和bits的分布
+
+* 特殊宏块ctu(1,5)的数据
+
+通过groundtruth.jpg提取的数据发现宏块ctu(1,5)在690帧中**都不包含前景**。通过公式训练的结果如下：
+
+<img src="http://q4alsq26d.bkt.clouddn.com/15.jpg" style="zoom:40%;" />
+
+发现：不存在前景分布时，公式训练的threshold在频率最高的背景位置。
+
+* 宏块ctu(3,3)的数据
+
+<img src="http://q4alsq26d.bkt.clouddn.com/33.jpg" style="zoom:33%;" />
+
+缩放data1的图：
+
+<img src="http://q4alsq26d.bkt.clouddn.com/33.1.jpg" style="zoom: 50%;" />
+
+<img src="http://q4alsq26d.bkt.clouddn.com/33.2.jpg" style="zoom:33%;" />
+
+发现对于data1的数据，公式有明显偏差（在背景分布的左侧）。对于data3的数据，公式训练的thres又偏大到了前景均值的位置。
