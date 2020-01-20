@@ -1,0 +1,20 @@
+﻿  NALwrite.cpp
+  SEIwrite.cpp
+  SyntaxElementWriter.cpp
+  TEncAnalyze.cpp
+  TEncBinCoderCABAC.cpp
+  TEncBinCoderCABACCounter.cpp
+  TEncCavlc.cpp
+  TEncCu.cpp
+  TEncEntropy.cpp
+  TEncGOP.cpp
+  TEncPic.cpp
+  TEncPreanalyzer.cpp
+  TEncRateCtrl.cpp
+  TEncSampleAdaptiveOffset.cpp
+  TEncSbac.cpp
+  TEncSearch.cpp
+  TEncSlice.cpp
+  TEncTop.cpp
+  WeightPredAnalysis.cpp
+  TLibEncoder.vcxproj -> E:\Working\Coding\EncryptionAndProcessing\FormatEncryptionAndDecryption\build\Win32\Release\TLibEncoder\TLibEncoder.lib

@@ -1,0 +1,22 @@
+﻿cl : Command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  WeightPredAnalysis.cpp
+  TEncTop.cpp
+  TEncSlice.cpp
+  TEncSearch.cpp
+  TEncSbac.cpp
+  TEncSampleAdaptiveOffset.cpp
+  TEncRateCtrl.cpp
+  TEncPreanalyzer.cpp
+  TEncPic.cpp
+  TEncGOP.cpp
+  TEncEntropy.cpp
+  TEncCu.cpp
+  TEncCavlc.cpp
+  TEncBinCoderCABACCounter.cpp
+  TEncBinCoderCABAC.cpp
+  TEncAnalyze.cpp
+  SyntaxElementWriter.cpp
+  SEIwrite.cpp
+  NALwrite.cpp
+  Generating Code...
+  TLibEncoder.vcxproj -> E:\Working\Coding\EncryptionAndProcessing\FormatEncryptionAndDecryption\build\Win32\Debug\TLibEncoder\TLibEncoder.lib

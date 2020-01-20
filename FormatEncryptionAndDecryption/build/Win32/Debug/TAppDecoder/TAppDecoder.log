@@ -1,0 +1,6 @@
+﻿cl : Command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  TAppDecTop.cpp
+  TAppDecCfg.cpp
+  decmain.cpp
+  Generating Code...
+  TAppDecoder.vcxproj -> E:\Working\Coding\EncryptionAndProcessing\FormatEncryptionAndDecryption\build\..\bin\Win32\Debug\TAppDecryptionDecoder.exe

@@ -1,0 +1,27 @@
+﻿  aeskey.cpp
+  ContextModel.cpp
+  ContextModel3DBuffer.cpp
+  SEI.cpp
+  TComBitStream.cpp
+  TComCABACTables.cpp
+  TComDataCU.cpp
+  TComInterpolationFilter.cpp
+  TComLoopFilter.cpp
+  TComMotionInfo.cpp
+  TComPattern.cpp
+  TComPic.cpp
+  TComPicSym.cpp
+  TComPicYuv.cpp
+  TComPicYuvMD5.cpp
+  TComPrediction.cpp
+  TComRdCost.cpp
+  TComRdCostWeightPrediction.cpp
+  TComRom.cpp
+  TComSampleAdaptiveOffset.cpp
+  Compiling...
+  TComSlice.cpp
+  TComTrQuant.cpp
+  TComWeightPrediction.cpp
+  TComYuv.cpp
+  libmd5.c
+  TLibCommon.vcxproj -> E:\Working\Coding\EncryptionAndProcessing\FormatEncryptionAndDecryption\build\Win32\Release\TLibCommon\TLibCommon.lib
