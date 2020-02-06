@@ -29,25 +29,6 @@ int imgWidth = -1;
 int imgHeight = -1;
 int CtuInWidth = -1;
 int CtuInHeight = -1;
-void GetFileNames(string path,vector<string>& filenames)
-{
-    DIR *pDir;
-    struct dirent* ptr;
-    if(!(pDir = opendir(path.c_str())))
-        return;
-    while((ptr = readdir(pDir))!=0) {
-//        cout << ""
-        if (strcmp(ptr->d_name, ".") != 0 && strcmp(ptr->d_name, "..") != 0){
-            cout << "++++++++++filePath: " << path.c_str()<<endl
-            << "++++++++++filename: " << ptr->d_name<<endl;
-            char * loc = strstr(ptr->d_name, ".jpg");
-            if(loc != NULL){
-                filenames.push_back(path + ptr->d_name);
-            }
-        }
-    }
-    closedir(pDir);
-}
 
 vector<int> Rect2CTUs(int x, int y, int width, int height)
 {
@@ -609,6 +590,7 @@ void mouseHandler(int event, int x, int y, int flags, void *param)
 		imshow("ori", ori);
 	}
 }
+//返回当前jpg的index
 int retriveIndex(char * fileName)
 {
 	string filename(fileName);
@@ -618,6 +600,32 @@ int retriveIndex(char * fileName)
 	int fileIndex = atoi(filename.substr(startPos, endPos - startPos + 1).c_str());
 	return fileIndex - 1;
 }
+
+void GetFileNames(string path,vector<string>& filenames)
+{
+    DIR *pDir;
+    struct dirent* ptr;
+    if(!(pDir = opendir(path.c_str())))
+        return;
+    while((ptr = readdir(pDir))!=0) {
+//        cout << ""
+        if (strcmp(ptr->d_name, ".") != 0 && strcmp(ptr->d_name, "..") != 0){
+            cout << "++++++++++filePath: " << path.c_str()<<endl
+            << "++++++++++filename: " << ptr->d_name<<endl;
+            char * loc = strstr(ptr->d_name, ".jpg");
+            if(loc != NULL){
+                //获取index == 0 的图片
+                int idx = retriveIndex(ptr -> d_name);
+                if(idx == 0) {
+                    filenames.push_back(path + ptr->d_name);
+                    break;
+                }
+            }
+        }
+    }
+    closedir(pDir);
+}
+
 string GetParent(string folder,string & folderName)
 {
 	size_t pos1 = folder.find_last_of('/');
@@ -861,6 +869,7 @@ int main(int argc, char* argv[])
      cout << "Error reading file " << file_name << endl;
      return -1;
     }
+    
 	img1 = img0.clone();// img1 is img0's back up
 	ori = img0.clone();
 	imgWidth = img0.cols;
@@ -887,7 +896,7 @@ int main(int argc, char* argv[])
 			string lastImg = GetImgName(file_name, fileIndex + 1);
 			cout << endl << "Processing image " << lastImg << " ..." << endl << endl;
             printf("handle filepath: %s\n" , lastImg.c_str());
-			img0 = imread(lastImg.c_str());
+			img0 = imread(lastImg.c_str(), 1);
 			img1 = img0.clone();
 		}
 		else if (key == 'f') //forward i.e. next frame
@@ -898,7 +907,7 @@ int main(int argc, char* argv[])
 			fileIndex = newFileIndex >(imgNum - 1) ? imgNum - 1 : newFileIndex;
 			string lastImg = GetImgName(file_name, fileIndex + 1);
 			cout << endl << "Processing image " << lastImg << " ..." << endl << endl;
-			img0 = imread(lastImg.c_str());
+			img0 = imread(lastImg.c_str(), 1);
 			img1 = img0.clone();
 		}
 		else if (key == 'c')// apply canny based prediction and forward based on the assumption that the bbox has been manually fine-tuned
@@ -914,7 +923,7 @@ int main(int argc, char* argv[])
 				{
 					Mat cannyOld = GenerateCanny(img1);
 					cout << endl << "Canny processing image " << lastImg << " ..." << endl << endl;
-					img0 = imread(lastImg.c_str());
+					img0 = imread(lastImg.c_str(), 1);
 					img1 = img0.clone();
 					Mat cannyNew = GenerateCanny(img1);
 					vector<Rectangle>::iterator I;
@@ -933,7 +942,7 @@ int main(int argc, char* argv[])
 				else
 				{
 					cout << endl << "Canny cached image " << lastImg << " ..." << endl << endl;
-					img0 = imread(lastImg.c_str());
+					img0 = imread(lastImg.c_str(), 1);
 					img1 = img0.clone();
 				}
 					
