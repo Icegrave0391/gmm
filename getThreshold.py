@@ -1,6 +1,43 @@
 import random
 import numpy as np
 
+class ThresHandler(object):
+    """
+    A threshold Handler
+    """
+    def __init__(self, N=3, H=4, W=5, gmm_compnum = 5):
+        self.params = {}
+        self.params['N'] = N
+        self.params['H'] = H
+        self.params['W'] = W
+        self.params['gmm_compnum'] = gmm_compnum
+
+    def get_thres(self, background):
+        """
+        Inputs:
+        - background: Array of input data of shape(N, H, W)
+          background[i,j,k] is given CTU info after GMM :
+           a list of tuple [(w, means, sds)] (len = gmm_compnum)
+
+
+        return:
+        - thres: Array of shape(N, H, W)
+        """
+        N, H, W = self.params['N'], self.params['H'], self.params['W']
+        gmm_compnum = self.params['gmm_compnum']
+        thres = np.zeros(shape=(N, H, W))
+        for i in range(N):
+            for j in range(H):
+                for k in range(W):
+                    bg_info = background[i][j][k]
+                    thresholdMax = -1
+                    for n in bg_info:
+                        thresholdTemp = 1.2*n[1] + 3*n[2]
+                        if thresholdTemp > thresholdMax:
+                            thresholdMax = thresholdTemp
+                    thres[i][j][k] = thresholdMax
+        return thres
+
 def getThreshold(background, backgroundNum, foreground, lambda1, step):
     # **************************************************
     # background 是一个list，list里面都是元组（w，mean，sds）
@@ -12,23 +49,25 @@ def getThreshold(background, backgroundNum, foreground, lambda1, step):
     # **************************************************
     bMax = -1
     fMin = 9999999999
-
+    weightedMiu = 0
 
     for i in background:
         if i[1] + 3 * i[2] > bMax:
             bMax = i[1] + i[1] + 3 * i[2]
-    for i in foreground:
-        if i < fMin:
-            fMin = i
-
+    if foreground:
+        fMin = np.min(foreground)
+        fMeduim = np.median(foreground)
+        fMax = np.max(foreground)
+    else:
+        fMax = fMin = fMeduim = 3 * bMax
     ratio = backgroundNum / (backgroundNum + len(foreground))
-    All = backgroundNum+ len(foreground)
-    fAverage = np.mean(foreground)
-
+    All = backgroundNum + len(foreground)
     MostWeightedIndex = findTheLargestGroup(background)
     thresholdIter = background[MostWeightedIndex][1] + 3*background[MostWeightedIndex][2]
+    for i in background:
+        weightedMiu  = weightedMiu + i[0]*(i[1] + 3*i[2])
 
-    threshold = stepByStep(background, foreground, thresholdIter, fAverage, bMax, fMin, ratio, All, lambda1, step)
+    threshold = stepByStep(background, foreground, weightedMiu, fMax, bMax, fMin, ratio, All, lambda1, step)
     return threshold
 
 def findTheLargestGroup(background):
@@ -42,7 +81,7 @@ def findTheLargestGroup(background):
 
 
 def stepByStep(background, foreground, thresholdIter, end, bMax, fMin, ratio, All, lambda1, step):
-    threshold = 0
+    threshold = thresholdIter
     lossValue = 99999999
     while thresholdIter < end:
         back = []

@@ -19,7 +19,7 @@
 using namespace std;
 using namespace cv;
 
-Mat img0, img1, IMG, ori;
+Mat img0, img1, IMG, ori; 
 int imgNum = 0;
 int fileIndex = -1;
 
