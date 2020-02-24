@@ -7,9 +7,13 @@ class ImageProc(object):
     """
     Image Process
     """
-    def __init__(self, frame_info={'num_frame':690, 'H':4, 'W':5}, odd_index = [], thres = None, data = None,
+    def __init__(self, frame_info = None, odd_index = None, thres = None, data = None,
                  means = 3, sds = 1, filter_mode = 'time',
-                 size = (320, 256), fps = 24):
+                 size = (320, 256), fps = 24, imgpath_prefix = './datasequence/test15/'):
+        if frame_info is None:
+            frame_info = {'num_frame':690, 'H':4, 'W':5}
+        if odd_index is None:
+            odd_index = []
         self.params = {}
         self.params['frame_info'] = frame_info
         self.params['odd_index'] = odd_index
@@ -22,6 +26,7 @@ class ImageProc(object):
         self.params['sds'] = sds
         self.params['size'] = size
         self.params['fps'] = fps
+        self.params['imgpath_prefix'] = imgpath_prefix
 
     def GaussianfilterByTime(self, miu, sds):
         frNum = self.params['frame_info']['num_frame']
