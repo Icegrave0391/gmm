@@ -59,7 +59,7 @@ class GTExtracter(object):
     def gt_to_table(self, data_dict):
         W = self.params['W']
         H = self.params['H']
-        print(W,H)
+        # print(W,H)
         ctus = data_dict['CTU_idx']
         gt = []
         for i in range(len(ctus)):
@@ -71,7 +71,7 @@ class GTExtracter(object):
                     cur_w, cur_h = self.ctu_2D_idx(ctu_curgroup[k])
                     print(i, ctu_curgroup[k], cur_w, cur_h)
                     gt[i][cur_h][cur_w] = 1
-        print(gt)
+        # print(gt)
         return gt
 
     # get gt
