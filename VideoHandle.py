@@ -1,6 +1,7 @@
 from sklearn.mixture import GaussianMixture
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+import sklearn.cluster as skc  # 密度聚类
 import numpy as np
 import getThreshold
 import PickForeground as imghandler
@@ -11,13 +12,13 @@ import math
 
 parser = argparse.ArgumentParser(description= 'A Tool for motion detector using GMM')
 
-parser.add_argument('video_output_path', type=str, default='./', help='video output path')
-parser.add_argument('video_frame_num', type=int, default=320, help='frame num for the certain video')
-parser.add_argument('video_frame_size', type=tuple, default=(1920,1080), help='resolution for the video, in tuple (W_pixel, H_pixel)')
-parser.add_argument('CTU_size', type=tuple, default=(32,32), help='size for a certain CTU, in tuple (W_pixel, H_pixel)')
-parser.add_argument('groundtruth_path', type=str, default='./datasequence/test15.txt', help='the ground truth file path (.txt file)')
-parser.add_argument('dataextract_path', type=str, default='./datasequence', help='data extract prefix path (without data1.txt)')
-parser.add_argument('imagesequence_path', type=str, default='./datasequence/test15/', help='image sequence path to generate video after label')
+parser.add_argument("-v",'--video_output_path', type=str, default='./', help='video output path')
+parser.add_argument("-n",'--video_frame_num', type=int, default=277, help='frame num for the certain video')
+parser.add_argument("-f",'--video_frame_size', type=tuple, default=(1920,1080), help='resolution for the video, in tuple (W_pixel, H_pixel)')
+parser.add_argument("-c",'--CTU_size', type=tuple, default=(32,32), help='size for a certain CTU, in tuple (W_pixel, H_pixel)')
+parser.add_argument("-g",'--groundtruth_path', type=str, default='ground/test_GT/test1.txt', help='the ground truth file path (.txt file)')
+parser.add_argument("-d",'--dataextract_path', type=str, default='datalist/', help='data extract prefix path (without data1.txt)')
+parser.add_argument("-i",'--imagesequence_path', type=str, default='media/img/test1/', help='image sequence path to generate video after label')
 parser.parse_args()
 opt = parser.parse_args()
 
@@ -60,7 +61,7 @@ def matrix(l:list, N, H, W):
     return l
 #save as list
 extract_path = opt.dataextract_path
-with open(extract_path + 'data1,txt', 'r') as f1:
+with open(extract_path + 'data1.txt', 'r') as f1:
     f_reaH = f1.read()
     f_data1 = f_reaH.replace("\n", "").split()
     f_data1 = list(map(int, f_data1))
@@ -78,7 +79,7 @@ with open(extract_path + 'data3.txt', 'r') as f3:
 
 f_data = [f_data1, f_data2, f_data3]
 f_CTU_data = [f_temp1, f_temp2, f_temp3]
-#idx （奇数、模2、模4）
+# idx （奇数、模2、模4）
 index = [[],[],[]]
 for i in range(FRAME_NUMS):
     if i % 2 == 0:
@@ -89,8 +90,10 @@ for i in range(FRAME_NUMS):
         else:
             index[1].append(i)
 
-#bg
+index[0].pop()
+# bg
 bg_table = []
+bg_table_dbscan = []
 fg_table = []
 #####################################################
 #bg_table : shape(3,4,5)
@@ -99,6 +102,7 @@ fg_table = []
 #fg_table 同理
 #####################################################
 matrix(bg_table, N, H, W)
+matrix(bg_table_dbscan, N, H, W)
 matrix(fg_table, N, H, W)
 #ground_truth
 # gt = []
@@ -126,14 +130,26 @@ for i_idx in range(N):
                 if temp_jk == 0:            #bg
                     backgroundNum[i_idx][j][k] += 1
                     temp_jkidx = i * CTU_NUMS + j * W + k
+                    bg_table_dbscan[i_idx][j][k].append([f_data[i_idx][temp_jkidx], 0])
                     bg_table[i_idx][j][k].append(f_data[i_idx][temp_jkidx])
                 else:
                     temp_jkidx = i * CTU_NUMS + j * W + k
                     fg_table[i_idx][j][k].append(f_data[i_idx][temp_jkidx])
 
+
+    # for k in range(N):
+    #     for i in range(H):
+    #         for j in range(W):
+    #             db = skc.DBSCAN(eps=3, min_samples=3).fit(bg_table_dbscan[k][i][j])  #
+    #             labels = db.labels_
+    #             after_dbscan = np.array(bg_table[k][i][j])
+    #             after_dbscan = after_dbscan[labels != -1]
+    #             after_dbscan = list(after_dbscan)
+    #             bg_table[k][i][j] = after_dbscan
+
 #Gau data
-bg_tableFit = np.array(bg_table).reshape(N,H,W)
-foreground = np.array(fg_table).reshape(N,H,W)
+bg_tableFit = np.array(bg_table).reshape(N, H, W)
+foreground = np.array(fg_table).reshape(N, H, W)
 #print(foreground)
 
 ###################################################
@@ -198,12 +214,12 @@ ThresHandler = getThreshold.ThresHandler(N=N, H=H, W=W, gmm_compnum=5)
 threshold = ThresHandler.get_thres(background)
 
 #plot test
-imgplot.show_CTU_fr(2, 2, bg_table, fg_table, threshold)
+imgplot.show_CTU_fr(11, 37, bg_table, fg_table, threshold)
 #judge bg or fg
 print("==============Start Img Process================")
 frame_info = {'num_frame':FRAME_NUMS, 'H': H, 'W': W}
 imgpath_prefix = opt.imagesequence_path
 ImgProc = imghandler.ImageProc(frame_info=frame_info, odd_index=index[0], thres=threshold, data=img_data,
-                               means=3, sds=1, filter_mode='time', size=(frame_size[0],frame_size[1]), fps=2, imgpath_prefix= imgpath_prefix)
+                               means=3, sds=1, filter_mode='time', frame_size=(frame_size[0], frame_size[1]), ctu_size=(32, 32), fps=24, imgpath_prefix=imgpath_prefix)
 ImgProc.process()
 print("=============Finish Img Process================")
