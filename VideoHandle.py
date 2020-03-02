@@ -17,7 +17,7 @@ parser.add_argument("-n",'--video_frame_num', type=int, default=277, help='frame
 parser.add_argument("-f",'--video_frame_size', type=tuple, default=(1920,1080), help='resolution for the video, in tuple (W_pixel, H_pixel)')
 parser.add_argument("-c",'--CTU_size', type=tuple, default=(32,32), help='size for a certain CTU, in tuple (W_pixel, H_pixel)')
 parser.add_argument("-g",'--groundtruth_path', type=str, default='ground/test_GT/test1.txt', help='the ground truth file path (.txt file)')
-parser.add_argument("-d",'--dataextract_path', type=str, default='datalist/', help='data extract prefix path (without data1.txt)')
+parser.add_argument("-d",'--dataextract_path', type=str, default='datalist/test1/', help='data extract prefix path (without data1.txt)')
 parser.add_argument("-i",'--imagesequence_path', type=str, default='media/img/test1/', help='image sequence path to generate video after label')
 parser.parse_args()
 opt = parser.parse_args()
