@@ -16,7 +16,7 @@ parser.add_argument('video_frame_num', type=int, default=320, help='frame num fo
 parser.add_argument('video_frame_size', type=tuple, default=(1920,1080), help='resolution for the video, in tuple (W_pixel, H_pixel)')
 parser.add_argument('CTU_size', type=tuple, default=(32,32), help='size for a certain CTU, in tuple (W_pixel, H_pixel)')
 parser.add_argument('groundtruth_path', type=str, default='./datasequence/test15.txt', help='the ground truth file path (.txt file)')
-parser.add_argument('dataextract_path', type=str, default='./datasequence', help='data extract prefix path (without data1.txt)')
+parser.add_argument('dataextract_path', type=str, default='./datasequence/', help='data extract prefix path (without data1.txt)')
 parser.add_argument('imagesequence_path', type=str, default='./datasequence/test15/', help='image sequence path to generate video after label')
 parser.parse_args()
 opt = parser.parse_args()
@@ -204,6 +204,6 @@ print("==============Start Img Process================")
 frame_info = {'num_frame':FRAME_NUMS, 'H': H, 'W': W}
 imgpath_prefix = opt.imagesequence_path
 ImgProc = imghandler.ImageProc(frame_info=frame_info, odd_index=index[0], thres=threshold, data=img_data,
-                               means=3, sds=1, filter_mode='time', size=(frame_size[0],frame_size[1]), fps=2, imgpath_prefix= imgpath_prefix)
+                               means=3, sds=1, filter_mode='time', size=(frame_size[0],frame_size[1]), fps=24, imgpath_prefix= imgpath_prefix)
 ImgProc.process()
 print("=============Finish Img Process================")

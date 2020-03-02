@@ -9,7 +9,7 @@ class ImageProc(object):
     """
     def __init__(self, frame_info = None, odd_index = None, thres = None, data = None,
                  means = 3, sds = 1, filter_mode = 'time',
-                 size = (320, 256), fps = 24, imgpath_prefix = './datasequence/test15/'):
+                 size = (1920, 1080), fps = 24, imgpath_prefix = './datasequence/test15/'):
         if frame_info is None:
             frame_info = {'num_frame':690, 'H':4, 'W':5}
         if odd_index is None:
