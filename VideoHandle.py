@@ -136,16 +136,14 @@ for i_idx in range(N):
                     temp_jkidx = i * CTU_NUMS + j * W + k
                     fg_table[i_idx][j][k].append(f_data[i_idx][temp_jkidx])
 
-
-    # for k in range(N):
-    #     for i in range(H):
-    #         for j in range(W):
-    #             db = skc.DBSCAN(eps=3, min_samples=3).fit(bg_table_dbscan[k][i][j])  #
-    #             labels = db.labels_
-    #             after_dbscan = np.array(bg_table[k][i][j])
-    #             after_dbscan = after_dbscan[labels != -1]
-    #             after_dbscan = list(after_dbscan)
-    #             bg_table[k][i][j] = after_dbscan
+# for i in range(H):
+#     for j in range(W):
+#         db = skc.DBSCAN(eps=3, min_samples=3).fit(bg_table_dbscan[0][i][j])
+#         labels = db.labels_
+#         after_dbscan = np.array(bg_table[0][i][j])
+#         after_dbscan = after_dbscan[labels != -1]
+#         after_dbscan = list(after_dbscan)
+#         bg_table[0][i][j] = after_dbscan
 
 #Gau data
 bg_tableFit = np.array(bg_table).reshape(N, H, W)
@@ -156,8 +154,8 @@ foreground = np.array(fg_table).reshape(N, H, W)
 #3-D mat （shape = (3,4,5)）元素是list(w, means, sds)
 means_t = []
 sds_t = []
-matrix(means_t, N,H,W)
-matrix(sds_t, N,H,W)
+matrix(means_t, N, H, W)
+matrix(sds_t, N, H, W)
 ###################################################
 matrix(background, N, H, W)
 #Gaus
@@ -214,7 +212,7 @@ ThresHandler = getThreshold.ThresHandler(N=N, H=H, W=W, gmm_compnum=5)
 threshold = ThresHandler.get_thres(background)
 
 #plot test
-imgplot.show_CTU_fr(11, 37, bg_table, fg_table, threshold)
+imgplot.show_CTU_fr(14, 28, bg_table, fg_table, threshold)
 #judge bg or fg
 print("==============Start Img Process================")
 frame_info = {'num_frame':FRAME_NUMS, 'H': H, 'W': W}
