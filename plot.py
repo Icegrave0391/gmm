@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from scipy import misc
 
+
 def show_CTU_fr(d1, d2, bg_table, fg_table, threshold):
 
     sub1 = plt.subplot(1,3,1)#data1

@@ -130,6 +130,15 @@ for i_idx in range(N):
 ##debug
 imgplot.show_gray_img(img_data, FRAME_NUMS, H, W)
 
+# for i in range(H):
+#     for j in range(W):
+#         db = skc.DBSCAN(eps=3, min_samples=3).fit(bg_table_dbscan[0][i][j])
+#         labels = db.labels_
+#         after_dbscan = np.array(bg_table[0][i][j])
+#         after_dbscan = after_dbscan[labels != -1]
+#         after_dbscan = list(after_dbscan)
+#         bg_table[0][i][j] = after_dbscan
+
 #Gau data
 bg_tableFit = np.array(bg_table).reshape(N, H, W)
 foreground = np.array(fg_table).reshape(N, H, W)

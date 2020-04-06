@@ -71,7 +71,6 @@ class GTExtracter(object):
                     cur_w, cur_h = self.ctu_2D_idx(ctu_curgroup[k])
                     print(i, ctu_curgroup[k], cur_w, cur_h)
                     gt[i][cur_h][cur_w] = 1
-        #print(gt)
         return gt
 
     # get gt
