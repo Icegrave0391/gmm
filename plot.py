@@ -1,6 +1,8 @@
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from scipy import misc
 
 def show_CTU_fr(d1, d2, bg_table, fg_table, threshold):
 
@@ -25,4 +27,15 @@ def show_CTU_fr(d1, d2, bg_table, fg_table, threshold):
     ctu_fg = np.array(fg_table[2][d1][d2])
     sns.distplot(ctu_bg)
     sns.distplot(ctu_fg)
+    plt.show()
+
+def show_gray_img(data_list, N, H, W):
+    l = []
+    for i in range(N):
+        frame = data_list[i]
+        for j in range(len(frame)):
+            l.append([frame[j]])
+    data = np.array(l).reshape(N-1,H,W)
+    gray_data = data[0,:,:] / 142 * 255
+    plt.imshow(gray_data, cmap='gray')
     plt.show()

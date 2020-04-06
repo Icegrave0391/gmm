@@ -104,13 +104,6 @@ matrix(bg_table, N, H, W)
 matrix(bg_table_dbscan, N, H, W)
 matrix(fg_table, N, H, W)
 #ground_truth
-# gt = []
-# a = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]
-# gt.append(a)
-# for i in range(2, FRAME_NUMS+1):
-#     fpath = './groundtruth'+'/gt00'+str(1103+i)+'.png'
-#     I = mpimg.imread(fpath)
-#     gt.append(I)
 gt_path = opt.groundtruth_path
 GTExtracter = GTExtract.GTExtracter(num_frame = FRAME_NUMS, fpath = gt_path, W_pixel = frame_size[0], H_pixel = frame_size[1], ctusize = ctu_size)
 gt = GTExtracter.get_gt()
@@ -134,17 +127,8 @@ for i_idx in range(N):
                 else:
                     temp_jkidx = i * CTU_NUMS + j * W + k
                     fg_table[i_idx][j][k].append(f_data[i_idx][temp_jkidx])
-
-
-    for k in range(N):
-        for i in range(H):
-            for j in range(W):
-                db = skc.DBSCAN(eps=3, min_samples=3).fit(bg_table_dbscan[k][i][j])  #
-                labels = db.labels_
-                after_dbscan = np.array(bg_table[k][i][j])
-                after_dbscan = after_dbscan[labels != -1]
-                after_dbscan = list(after_dbscan)
-                bg_table[k][i][j] = after_dbscan
+##debug
+imgplot.show_gray_img(img_data, FRAME_NUMS, H, W)
 
 #Gau data
 bg_tableFit = np.array(bg_table).reshape(N, H, W)
@@ -155,8 +139,8 @@ foreground = np.array(fg_table).reshape(N, H, W)
 #3-D mat （shape = (3,4,5)）元素是list(w, means, sds)
 means_t = []
 sds_t = []
-matrix(means_t, N,H,W)
-matrix(sds_t, N,H,W)
+matrix(means_t, N, H, W)
+matrix(sds_t, N, H, W)
 ###################################################
 matrix(background, N, H, W)
 #Gaus
@@ -213,7 +197,7 @@ ThresHandler = getThreshold.ThresHandler(N=N, H=H, W=W, gmm_compnum=5)
 threshold = ThresHandler.get_thres(background)
 
 #plot test
-imgplot.show_CTU_fr(11, 37, bg_table, fg_table, threshold)
+imgplot.show_CTU_fr(14, 28, bg_table, fg_table, threshold)
 #judge bg or fg
 print("==============Start Img Process================")
 frame_info = {'num_frame':FRAME_NUMS, 'H': H, 'W': W}
