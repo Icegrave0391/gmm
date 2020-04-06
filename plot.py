@@ -35,7 +35,9 @@ def show_gray_img(data_list, N, H, W):
         frame = data_list[i]
         for j in range(len(frame)):
             l.append([frame[j]])
-    data = np.array(l).reshape(N-1,H,W)
-    gray_data = data[0,:,:] / 142 * 255
+    data = np.array(l).reshape(N-1,H,W)  # 这里要reshape为N-1 观察到最后一帧数据是空的
+    # 画第0帧
+    gray_data = data[2,:,:]
+    gray_data = gray_data / np.max(gray_data) * 255
     plt.imshow(gray_data, cmap='gray')
     plt.show()
